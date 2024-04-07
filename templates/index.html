@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>STADVDB MCO2</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1 style="text-align: center;">STADVDB MCO2</h1>
+
+    <div class="form">
+        <form action="/" method="POST">
+            <input type="text" name="content" id="content">
+            <input type="submit" value="Add Item">
+        </form>
+    </div>
+
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Doables</th>
+        </tr>
+
+        {% for item in items %}
+            <tr>
+                <td>{{ item.title }}</td>
+                <td>{{ item.date_added }}</td>
+                <td>
+                    <a href="/delete/{{item.id}}">Delete</a>
+                    <br>
+                    <a href="/update/{{item.id}}">Edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
