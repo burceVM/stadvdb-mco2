@@ -78,22 +78,19 @@ def add():
         starttime = format_time(starttime)
         endtime = format_time(endtime)
 
+        try:
+            cur = db.connection.cursor()
+            cur.execute(f"INSERT INTO appointments\
+                        VALUES ('{pxid}','{clinicid}','{doctorid}','{apptid}','{status}','{timequeued}','{queuedate}',\
+                            '{starttime}','{endtime}','{type}','{virtual}','{hospitalname}','{ishospital}','{city}',\
+                            '{province}','{regionname}','{mainspecialty}',{doctor_age},{px_age},'{gender}')")
+            cur.close()
+
+            db.connection.commit()
+            return redirect('/')
         
-
-        cur = db.connection.cursor()
-        cur.execute(f"INSERT INTO appointments\
-                     VALUES ('{pxid}','{clinicid}','{doctorid}','{apptid}','{status}','{timequeued}','{queuedate}',\
-                        '{starttime}','{endtime}','{type}','{virtual}','{hospitalname}','{ishospital}','{city}',\
-                        '{province}','{regionname}','{mainspecialty}',{doctor_age},{px_age},'{gender}')")
-        cur.close()
-
-        db.connection.commit()
-        return redirect('/')
-
-        # try:
-        
-        # except:
-        #     return 'Something went wrong with adding that item'
+        except:
+            return 'Something went wrong with adding that item'
         
     else:
         return render_template('add.html')
