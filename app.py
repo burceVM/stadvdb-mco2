@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime
 
 from flask_mysqldb import MySQL
 
@@ -16,42 +15,92 @@ app.config['MYSQL_DB'] = 'mco2'
 
 db = MySQL(app)
 
-# class Sample(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
+# class Appointment(db.Model):
+#     pxid = db.Column(db.String(32))
+#     clinicid = db.Column(db.String(32))
+#     doctorid = db.Column(db.String(32))
+#     apptid = db.Column(db.String(32), primary_key=True)
+
 #     title = db.Column(db.String(200), nullable=False)
 #     date_added = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
 #     def __repr__(self):
-#         return '<Task %r>' % self.id
+#         return '<Apt %r>' % self.apptid
 
 # stuff for db initialization
 # with app.app_context():
 #     db.create_all()
 
+def format_time(input):
+    html_datetime = datetime.fromisoformat(input)
+    mysql_datetime_str = html_datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+    return mysql_datetime_str
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
         cur = db.connection.cursor()
-        cur.execute("SELECT * FROM appointments WHERE hospitalname='The Medical City'")
+        cur.execute("SELECT * FROM appointments WHERE City='Santa Cruz'")
         results = cur.fetchall()
         cur.close()
 
-        # items = Sample.query.order_by(Sample.date_added).all()
+        # items = Appointment.query.order_by(Appointment.date_added).all()
         return render_template('index.html', items = results)
 
-@app.route('/add/<apptid>', methods=['POST'])
+@app.route('/add', methods=['POST', 'GET'])
 def add():
-    item_to_delete = Sample.query.get_or_404(id)
+    # item_to_delete = Appointment.query.get_or_404(id)
     
-    try:
-        db.session.delete(item_to_delete)
-        db.session.commit()
+    if request.method == 'POST':
+        pxid = request.form['pxid']
+        clinicid = request.form['clinicid']
+        doctorid = request.form['doctorid']
+        apptid = request.form['apptid']
+        status = request.form['status']
+        timequeued = request.form['timequeued']
+        queuedate = request.form['queuedate']
+        starttime = request.form['starttime']
+        endtime = request.form['endtime']
+        type = request.form['type']
+        virtual = request.form['virtual']
+        hospitalname = request.form['hospitalname']
+        ishospital = request.form['ishospital']
+        city = request.form['city']
+        province = request.form['province']
+        regionname = request.form['regionname']
+        mainspecialty = request.form['mainspecialty']
+        doctor_age = request.form['doctor_age']
+        px_age = request.form['px_age']
+        gender = request.form['gender']
+
+        timequeued = format_time(timequeued)
+        queuedate = format_time(queuedate)
+        starttime = format_time(starttime)
+        endtime = format_time(endtime)
+
+        
+
+        cur = db.connection.cursor()
+        cur.execute(f"INSERT INTO appointments\
+                     VALUES ('{pxid}','{clinicid}','{doctorid}','{apptid}','{status}','{timequeued}','{queuedate}',\
+                        '{starttime}','{endtime}','{type}','{virtual}','{hospitalname}','{ishospital}','{city}',\
+                        '{province}','{regionname}','{mainspecialty}',{doctor_age},{px_age},'{gender}')")
+        cur.close()
+
+        db.connection.commit()
         return redirect('/')
-    except:
-        return 'Something went wrong with adding that item'
+
+        # try:
+        
+        # except:
+        #     return 'Something went wrong with adding that item'
+        
+    else:
+        return render_template('add.html')
 
 @app.route('/delete/<int:id>')
 def delete(id):
-    item_to_delete = Sample.query.get_or_404(id)
+    item_to_delete = Appointment.query.get_or_404(id)
     
     try:
         db.session.delete(item_to_delete)
@@ -62,7 +111,7 @@ def delete(id):
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
-    item = Sample.query.get_or_404(id)
+    item = Appointment.query.get_or_404(id)
 
     if request.method == 'POST':
         item.title = request.form['content']

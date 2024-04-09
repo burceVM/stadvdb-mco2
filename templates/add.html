@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>STADVDB MCO2</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1 style="text-align: center;">STADVDB MCO2</h1>
+
+    <div class="form">
+        <form action="/add" method="POST">
+            pxid <input type="text" name="pxid"><br>
+            clinicid <input type="text" name="clinicid"><br>
+            doctorid <input type="text" name="doctorid"><br>
+            apptid <input type="text" name="apptid"><br>
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+              <option value="cancel">Cancel</option>
+              <option value="complete">Complete</option>
+              <option value="noshow">NoShow</option>
+              <option value="queued">Queued</option>
+              <option value="serving">Serving</option>
+              <option value="skip">Skip</option>
+            </select><br>
+            timequeued <input type="datetime-local" name="timequeued"><br>
+            queuedate <input type="datetime-local" name="queuedate"><br>
+            starttime <input type="datetime-local" name="starttime"><br>
+            endtime <input type="datetime-local" name="endtime"><br>
+            <label for="type">Type:</label>
+            <select id="type" name="type">
+              <option value="consultation">Consultation</option>
+              <option value="inpatient">Inpatient</option>
+            </select><br>
+            <label for="virtual">Virtual:</label>
+            <select id="virtual" name="virtual">
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select><br>
+            hospitalname <input type="text" name="hospitalname"><br>
+            <label for="ishospital">ishospital:</label>
+            <select id="ishospital" name="ishospital">
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select><br>
+            city <input type="text" name="city"><br>
+            province <input type="text" name="province"><br>
+            regionname <input type="text" name="regionname"><br>
+            mainspecialty <input type="text" name="mainspecialty"><br>
+            doctor_age <input type="number" name="doctor_age"><br>
+            px_age <input type="number" name="px_age"><br>
+            <label for="gender">gender:</label>
+            <select id="gender" name="gender">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select><br>
+            <input type="submit" value="Add Appointment">
+        </form>
+    </div>
+</div>
+{% endblock %}
