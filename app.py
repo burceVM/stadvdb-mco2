@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from datetime import datetime
 
 from flask_mysqldb import MySQL
@@ -9,7 +9,7 @@ app.config['MYSQL_HOST'] = 'ccscloud.dlsu.edu.ph'
 app.config['MYSQL_PORT'] = 20201
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'H2yPm49GvUWgAcuw38sphQ7f'
-app.config['MYSQL_DB'] = 'mco2'
+app.config['MYSQL_DB'] = 'mco2_final'
 
 db = MySQL(app)
 
@@ -23,13 +23,19 @@ def format_time(input):
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-        cur = db.connection.cursor()
-        cur.execute("SELECT * FROM appointments WHERE City='Santa Cruz'")
-        results = cur.fetchall()
-        cur.close()
+    
+    query = request.form.get('query')
+    cur = db.connection.cursor()
 
-        # items = Appointment.query.order_by(Appointment.date_added).all()
-        return render_template('index.html', items = results)
+    if query:
+        cur.execute(query)
+    else:
+        cur.execute("SELECT * FROM appointments WHERE City='Santa Cruz'")
+
+    results = cur.fetchall()
+    cur.close()
+
+    return render_template('index.html', items = results, porty = app.config['MYSQL_PORT'])
 
 @app.route('/add', methods=['POST', 'GET'])
 def add():
@@ -127,26 +133,36 @@ def update(upd_id):
         starttime = format_time(starttime)
         endtime = format_time(endtime)
 
-        cur = db.connection.cursor()
-        cur.execute(f"UPDATE appointments\
-                    SET pxid='{pxid}',clinicid='{clinicid}',doctorid='{doctorid}',apptid='{apptid}',status='{status}',\
-                        timequeued='{timequeued}',queuedate='{queuedate}',starttime='{starttime}',endtime='{endtime}',\
-                        type='{type}',`virtual`='{virtual}',hospitalname='{hospitalname}',ishospital='{ishospital}',\
-                        city='{city}',province='{province}',regionname='{regionname}',mainspecialty='{mainspecialty}',\
-                        doctor_age={doctor_age},px_age={px_age},gender='{gender}'\
-                    WHERE apptid='{upd_id}'")
-        cur.close()
+        try:
+            cur = db.connection.cursor()
+            cur.execute(f"UPDATE appointments\
+                        SET pxid='{pxid}',clinicid='{clinicid}',doctorid='{doctorid}',apptid='{apptid}',status='{status}',\
+                            timequeued='{timequeued}',queuedate='{queuedate}',starttime='{starttime}',endtime='{endtime}',\
+                            type='{type}',`virtual`='{virtual}',hospitalname='{hospitalname}',ishospital='{ishospital}',\
+                            city='{city}',province='{province}',regionname='{regionname}',mainspecialty='{mainspecialty}',\
+                            doctor_age={doctor_age},px_age={px_age},gender='{gender}'\
+                        WHERE apptid='{upd_id}'")
+            cur.close()
 
-        db.connection.commit()
-        return redirect('/')
-
-        # try:
+            db.connection.commit()
+            return redirect('/')
         
-        # except:
-        #     return 'Something went wrong with updating that item'
+        except:
+            return 'Something went wrong with updating that item'
         
     else:
         return render_template('update.html', item = appt_to_update[0])
+
+@app.route('/update_port', methods=['GET', 'POST'])
+def update_port():
+    port = request.form.get('port')
+    port = int(port)
+    if port:
+        app.config['MYSQL_PORT'] = port
+        print(f'Port updated to {port}')
+    else:
+        return 'No port specified'
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)

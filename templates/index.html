@@ -2,6 +2,7 @@
 
 {% block head %}
 <title>STADVDB MCO2</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -10,12 +11,26 @@
 
     <div class="form">
         <form action="/" method="POST">
-            <input type="text" name="content" id="content">
-            <input type="submit" value="Search">
+            <input type="text" name="query" id="query">
+            <input type="submit" value="Go">
         </form>
     </div>
 
-    <a href="/add">Add New Item</a>
+    <a href="/add">Add New Item</a><br>
+
+    <p>Change port:</p>  
+
+    <form action="/update_port" method="post">
+        <label for="port">Select Port:</label>
+        <select id="port" name="port" value="{{ porty }}">
+            <option value="20201">20201</option>
+            <option value="20202">20202</option>
+            <option value="20203">20203</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+
+    <p>Current: {{ porty }}</p>
 
     <table>
         <tr>
